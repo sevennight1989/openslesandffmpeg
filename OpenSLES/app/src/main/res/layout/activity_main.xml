@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button android:id="@+id/run"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="run"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:onClick="onClick"/>
+
+    <Button android:id="@+id/quit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="quit"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:layout_below="@+id/run"
+        android:onClick="onClick"/>
+
+    <Button android:id="@+id/callback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="callback"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:layout_below="@+id/quit"
+        android:onClick="onClick"/>
+
+    <Button android:id="@+id/playAsset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="playAsset"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:layout_below="@+id/callback"
+        android:onClick="onClick"/>
+
+    <Button android:id="@+id/stopAsset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stopAsset"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:layout_below="@+id/playAsset"
+        android:onClick="onClick"/>
+
+</RelativeLayout>
