@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
                 //权限被拒绝时给用户友好提示
             }
         });
-        avcodeConfigFromJni();
+        avcodeConfig();
+        avfilterinfo();
     }
 
     public void onClick(View v){
@@ -70,7 +71,11 @@ public class MainActivity extends AppCompatActivity {
     public native void callback();
     public native void playAssetResource(AssetManager assetManager,String fileName);
     public native void stopAssetResource();
-    public native String avcodeConfigFromJni();
+    public native String avcodeConfig();
+    public native String avfilterinfo();
+    public native String protocolinfo();
+    public native String avformatinfo();
+    public native String avcodecinfo();
     public void onError(int code,String msg){
         Log.d(TAG,"[ code = " + code +"    msg = " + msg +" ]");
     }

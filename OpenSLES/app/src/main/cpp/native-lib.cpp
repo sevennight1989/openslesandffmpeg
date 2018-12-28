@@ -17,6 +17,11 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libswresample/swresample.h>
+#include <libavutil/pixdesc.h>
+#include <libavfilter/avfilter.h>
 }
 
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__)
@@ -57,6 +62,7 @@ pthread_mutex_t mutex;
 pthread_cond_t cond;
 
 int flag = 1;
+
 
 void *productThread(void *data) {
 
@@ -237,6 +243,89 @@ Java_aa_opensles_MainActivity_playAssetResource(
 
 }
 
+char *avformatinfo() {
+    char *info = static_cast<char *>(malloc(40000));
+    memset(info, 0, 40000);
+    av_register_all();
+    AVInputFormat *if_temp = av_iformat_next(NULL);
+    AVOutputFormat *of_temp = av_oformat_next(NULL);
+    while (if_temp != NULL) {
+        sprintf(info, "%s[In ]%10s\n", info, if_temp->name);
+        if_temp = if_temp->next;
+    }
+    while (of_temp != NULL) {
+        sprintf(info, "%s[Out ]%10s\n", info, of_temp->name);
+        of_temp = of_temp->next;
+    }
+    return info;
+}
+
+char *avcodecinfo() {
+    char *info = static_cast<char *>(malloc(40000));
+    memset(info, 0, 40000);
+    av_register_all();
+    AVCodec *c_temp = av_codec_next(NULL);
+    while (c_temp != NULL) {
+        if (c_temp->decode != NULL) {
+            sprintf(info, "%s[Dec]", info);
+        } else {
+            sprintf(info, "%s[Enc", info);
+        }
+        switch (c_temp->type) {
+            case AVMEDIA_TYPE_VIDEO:
+                sprintf(info, "%s[Video]", info);
+                break;
+            case AVMEDIA_TYPE_AUDIO:
+                sprintf(info, "%s[Audio]", info);
+                break;
+            default:
+                sprintf(info, "%s[Others]", info);
+                break;
+        }
+        sprintf(info, "%s %10s\n", info, c_temp->name);
+        c_temp = c_temp->next;
+    }
+    return info;
+}
+
+char *urlprotocolinfo() {
+    char *info = static_cast<char *>(malloc(40000));
+    memset(info, 0, 40000);
+    av_register_all();
+    struct URLProtocol *pup = NULL;
+    struct URLProtocol **p_temp = &pup;
+    avio_enum_protocols(reinterpret_cast<void **>(p_temp), 0);
+    while ((*p_temp) != NULL) {
+        sprintf(info, "%s[In ][%10s]\n", info,
+                avio_enum_protocols(reinterpret_cast<void **>(p_temp), 0));
+    }
+    pup = NULL;
+
+    avio_enum_protocols(reinterpret_cast<void **>(p_temp), 1);
+    while ((*p_temp) != NULL) {
+        sprintf(info, "%s[Out ][%10s]\n", info,
+                avio_enum_protocols(reinterpret_cast<void **>(p_temp), 1));
+    }
+    LOGD("%s", info);
+    return info;
+}
+
+extern "C" JNIEXPORT jstring
+JNICALL
+Java_aa_opensles_MainActivity_avcodecinfo(
+        JNIEnv *env,
+        jobject) {
+    return env->NewStringUTF(avcodecinfo());
+}
+
+extern "C" JNIEXPORT jstring
+JNICALL
+Java_aa_opensles_MainActivity_avformatinfo(
+        JNIEnv *env,
+        jobject) {
+    return env->NewStringUTF(avformatinfo());
+}
+
 
 extern "C" JNIEXPORT void
 JNICALL
@@ -252,12 +341,37 @@ Java_aa_opensles_MainActivity_stopAssetResource(
 
 extern "C" JNIEXPORT jstring
 JNICALL
-Java_aa_opensles_MainActivity_avcodeConfigFromJni(
+Java_aa_opensles_MainActivity_avcodeConfig(
         JNIEnv *env,
-        jobject ) {
+        jobject) {
     char info[10000] = {0};
     sprintf(info, "%s\n", avcodec_configuration());
-    LOGD("--> %s",info);
+    LOGD("--> %s", info);
     return env->NewStringUTF(info);
 }
+
+extern "C" JNIEXPORT jstring
+JNICALL
+Java_aa_opensles_MainActivity_avfilterinfo(
+        JNIEnv *env,
+        jobject) {
+    char *info = (char *) malloc(40000);
+    memset(info, 0, 40000);
+    avfilter_register_all();
+    AVFilter *f_temp = (AVFilter *) avfilter_next(NULL);
+    while (f_temp != NULL) {
+        sprintf(info, "%s[%15s]\n", info, f_temp->name);
+        f_temp = f_temp->next;
+    }
+    return env->NewStringUTF(info);
+}
+
+extern "C" JNIEXPORT jstring
+JNICALL
+Java_aa_opensles_MainActivity_protocolinfo(
+        JNIEnv *env,
+        jobject) {
+    return env->NewStringUTF(urlprotocolinfo());
+}
+
 
